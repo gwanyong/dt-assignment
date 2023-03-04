@@ -30,7 +30,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: flex-end;
-      width: 100%;
+      width: 80%;
       height: 20%;
       padding: 0.5rem;
       background-color: #f1f1f1;
@@ -39,6 +39,8 @@
 
     .display .result {
       font-weight: bold;
+      padding: 0.5rem;
+      font-size: 50px;
     }
 
     .buttons {
@@ -100,7 +102,7 @@
         <button class="number-button" id="7">7</button>
         <button class="number-button" id="8">8</button>
         <button class="number-button" id="9">9</button>
-        <button class="orange-button" id="multiply">×</button>
+        <button class="orange-button" id="multiply">x</button>
         <button class="number-button" id="4">4</button>
         <button class="number-button" id="5">5</button>
         <button class="number-button" id="6">6</button>
@@ -114,6 +116,150 @@
         <button class="orange-button" id="equal">=</button>
       </div>
     </div>
-    <script src="script.js"></script>
+    <script>
+      const calculator = {
+        displayValue: '0',
+        firstOperand: null,
+        waitingForSecondOperand: false,
+        operator: null,
+      };
+
+      function updateDisplay() {
+        const display = document.querySelector('.result');
+        display.textContent = calculator.displayValue;
+      }
+
+      updateDisplay();
+
+      function inputDigit(digit) {
+        const { displayValue, waitingForSecondOperand } = calculator;
+
+        if (waitingForSecondOperand === true) {
+          calculator.displayValue = digit;
+          calculator.waitingForSecondOperand = false;
+        } else {
+          calculator.displayValue =
+            displayValue === '0' ? digit : displayValue + digit;
+        }
+      }
+
+      function inputDecimal(dot) {
+        if (calculator.waitingForSecondOperand === true) {
+          calculator.displayValue = '0.';
+          calculator.waitingForSecondOperand = false;
+          return;
+        }
+
+        if (!calculator.displayValue.includes(dot)) {
+          calculator.displayValue += dot;
+        }
+      }
+
+      function handleOperator(nextOperator) {
+        const { firstOperand, displayValue, operator } = calculator;
+        const inputValue = parseFloat(displayValue);
+        if (operator && calculator.waitingForSecondOperand) {
+          calculator.operator = nextOperator;
+          return;
+        }
+
+        if (firstOperand == null) {
+          calculator.firstOperand = inputValue;
+        } else if (operator) {
+          const currentValue = firstOperand || 0;
+          const result = performCalculation[operator](currentValue, inputValue);
+
+          calculator.displayValue = `${parseFloat(result.toFixed(7))}`;
+          calculator.firstOperand = result;
+        }
+
+        calculator.waitingForSecondOperand = true;
+        calculator.operator = nextOperator;
+      }
+
+      const performCalculation = {
+        '÷': (firstOperand, secondOperand) => firstOperand / secondOperand,
+
+        x: (firstOperand, secondOperand) => firstOperand * secondOperand,
+
+        '+': (firstOperand, secondOperand) => firstOperand + secondOperand,
+
+        '-': (firstOperand, secondOperand) => firstOperand - secondOperand,
+
+        '=': (firstOperand, secondOperand) => secondOperand,
+
+        '%': (firstOperand, secondOperand) => secondOperand / 100,
+      };
+
+      function clearButtonClick() {
+        calculator.displayValue = '0';
+        calculator.firstOperand = null;
+        calculator.waitingForSecondOperand = false;
+        calculator.operator = null;
+      }
+
+      const numberButtons = document.querySelectorAll('.number-button');
+      numberButtons.forEach((button) =>
+        button.addEventListener('click', () => {
+          inputDigit(button.textContent);
+          updateDisplay();
+        }),
+      );
+
+      const decimalButton = document.querySelector('#decimal');
+      decimalButton.addEventListener('click', () => {
+        inputDecimal(decimalButton.textContent);
+        updateDisplay();
+      });
+
+      function toggleSign() {
+        const result = calculator.displayValue;
+
+        let newValue;
+        if (result !== '0') {
+          newValue = parseFloat(result) * -1;
+        } else {
+          newValue = parseFloat(formula.slice(0, -1)) * -1;
+        }
+
+        return newValue;
+      }
+
+      const toggleButton = document.querySelector('#plus-minus');
+      toggleButton.addEventListener('click', () => {
+        calculator.displayValue = toggleSign();
+        updateDisplay();
+      });
+
+      const percentageButton = document.querySelector('#percentage');
+      percentageButton.addEventListener('click', (text) => {
+        calculator.displayValue = parseInt(calculator.displayValue) / 100;
+        // handleOperator(button.textContent);
+        updateDisplay();
+      });
+
+      const operatorButtons = document.querySelectorAll('.orange-button');
+      operatorButtons.forEach((button) =>
+        button.addEventListener('click', () => {
+          handleOperator(button.textContent);
+          updateDisplay();
+        }),
+      );
+
+      const grayButtons = document.querySelectorAll('.gray-button');
+      grayButtons.forEach((button) =>
+        button.addEventListener('click', () => {
+          display.textContent = calculator.displayValue;
+          handleOperator(button.textContent);
+          updateDisplay();
+        }),
+      );
+
+      const clearButton = document.querySelector('#clear');
+      clearButton.addEventListener('click', () => {
+        clearButtonClick();
+        updateDisplay();
+      });
+    </script>
   </body>
 </html>
