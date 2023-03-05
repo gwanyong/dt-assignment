@@ -12,6 +12,7 @@ const calculator: Calculator = {
   operator: null,
 };
 
+//결과값 출력
 function updateDisplay() {
   const display = document.querySelector('.result');
   display.textContent = calculator.displayValue;
@@ -19,6 +20,7 @@ function updateDisplay() {
 
 updateDisplay();
 
+//숫자 입력
 function inputDigit(digit: string) {
   const { displayValue, waitingForSecondOperand } = calculator;
 
@@ -31,6 +33,7 @@ function inputDigit(digit: string) {
   }
 }
 
+//소수점 입력
 function inputDecimal(dot: string) {
   if (calculator.waitingForSecondOperand === true) {
     calculator.displayValue = '0.';
@@ -43,6 +46,7 @@ function inputDecimal(dot: string) {
   }
 }
 
+//연산자 입력
 function handleOperator(nextOperator: string) {
   const { firstOperand, displayValue, operator } = calculator;
   const inputValue = parseFloat(displayValue);
@@ -65,6 +69,7 @@ function handleOperator(nextOperator: string) {
   calculator.operator = nextOperator;
 }
 
+//연산자에 따른 계산
 const performCalculation: {
   [operator: string]: (firstOperand: number, secondOperand: number) => number;
 } = {
@@ -79,6 +84,7 @@ const performCalculation: {
   '=': (secondOperand) => secondOperand,
 };
 
+//초기화
 function clearButtonClick() {
   calculator.displayValue = '0';
   calculator.firstOperand = null;
@@ -86,6 +92,7 @@ function clearButtonClick() {
   calculator.operator = null;
 }
 
+// 숫자 버튼 클릭 시 이벤트 리스너
 const numberButtons = document.querySelectorAll('.number-button');
 numberButtons.forEach((button) =>
   button.addEventListener('click', () => {
@@ -94,12 +101,14 @@ numberButtons.forEach((button) =>
   }),
 );
 
+// 소수점 버튼 클릭 시 이벤트 리스너
 const decimalButton = document.querySelector('#decimal');
 decimalButton.addEventListener('click', () => {
   inputDecimal(decimalButton.textContent);
   updateDisplay();
 });
 
+// 부호 변경 버튼 클릭 시 이벤트 리스너
 function toggleSign() {
   const result = calculator.displayValue;
   let newValue;
@@ -113,18 +122,21 @@ function toggleSign() {
   return String(newValue);
 }
 
+// 부호 변경 버튼 클릭 시 이벤트 리스너
 const toggleButton = document.querySelector('#plus-minus');
 toggleButton.addEventListener('click', () => {
   calculator.displayValue = toggleSign();
   updateDisplay();
 });
 
+// 퍼센트 버튼 클릭 시 이벤트 리스너
 const percentageButton = document.querySelector('#percentage');
 percentageButton.addEventListener('click', (text) => {
   calculator.displayValue = String(parseInt(calculator.displayValue) / 100);
   updateDisplay();
 });
 
+// 연산자 버튼 클릭 시 이벤트 리스너 ( +, -, x, ÷, =)
 const operatorButtons = document.querySelectorAll('.orange-button');
 operatorButtons.forEach((button) =>
   button.addEventListener('click', () => {
@@ -133,6 +145,7 @@ operatorButtons.forEach((button) =>
   }),
 );
 
+// 연산자 버튼 클릭 시 이벤트 리스너 ( c, +/-, %)
 const grayButtons = document.querySelectorAll('.gray-button');
 grayButtons.forEach((button) =>
   button.addEventListener('click', () => {
@@ -141,6 +154,7 @@ grayButtons.forEach((button) =>
   }),
 );
 
+// 초기화 버튼 클릭 시 이벤트 리스너
 const clearButton = document.querySelector('#clear');
 clearButton.addEventListener('click', () => {
   clearButtonClick();
